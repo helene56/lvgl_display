@@ -66,6 +66,10 @@ int main(void)
 		LOG_ERR("Device not ready, aborting test");
 		return 0;
 	}
+	LOG_INF("Got device :)\n");
+	lv_obj_t *screen = lv_screen_active();
+	lv_obj_set_style_bg_color(screen, lv_color_white(), LV_PART_MAIN);
+	lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, LV_PART_MAIN);
 
 #ifdef CONFIG_RESET_COUNTER_SW0
 	if (gpio_is_ready_dt(&button_gpio)) {
@@ -136,14 +140,22 @@ int main(void)
 	}
 
 	lv_label_set_text(hello_world_label, "Hello world!");
+	lv_obj_set_style_text_font(hello_world_label, &lv_font_montserrat_24, 0);
 	lv_obj_align(hello_world_label, LV_ALIGN_CENTER, 0, 0);
 
 	count_label = lv_label_create(lv_screen_active());
 	lv_obj_align(count_label, LV_ALIGN_BOTTOM_MID, 0, 0);
+	lv_obj_set_style_text_font(count_label, &lv_font_montserrat_24, 0);
 
 	lv_timer_handler();
 	display_blanking_off(display_dev);
 
+
+	lv_obj_t *scr = lv_screen_active();
+	lv_coord_t width = lv_obj_get_width(scr);
+	lv_coord_t height = lv_obj_get_height(scr);
+
+	LOG_INF("Screen size: %d x %d", width, height);
 	while (1) {
 		if ((count % 100) == 0U) {
 			sprintf(count_str, "%d", count/100U);
