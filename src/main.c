@@ -14,6 +14,7 @@
 #include <zephyr/kernel.h>
 #include <lvgl_input_device.h>
 
+
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(app);
@@ -67,9 +68,6 @@ int main(void)
 		return 0;
 	}
 	LOG_INF("Got device :)\n");
-	lv_obj_t *screen = lv_screen_active();
-	lv_obj_set_style_bg_color(screen, lv_color_white(), LV_PART_MAIN);
-	lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, LV_PART_MAIN);
 
 #ifdef CONFIG_RESET_COUNTER_SW0
 	if (gpio_is_ready_dt(&button_gpio)) {
@@ -100,16 +98,18 @@ int main(void)
 #endif /* CONFIG_RESET_COUNTER_SW0 */
 
 #ifdef CONFIG_LV_Z_ENCODER_INPUT
-	lv_obj_t *arc;
-	lv_group_t *arc_group;
+	lv_obj_t *arc = lv_arc_create(lv_scr_act());
+    lv_obj_set_size(arc, 150, 150);
+    lv_obj_align(arc, LV_ALIGN_CENTER, 0, 0);
 
-	arc = lv_arc_create(lv_screen_active());
-	lv_obj_align(arc, LV_ALIGN_CENTER, 0, -15);
-	lv_obj_set_size(arc, 150, 150);
+    lv_group_t *arc_group = lv_group_create();
+    lv_group_add_obj(arc_group, arc);
 
-	arc_group = lv_group_create();
-	lv_group_add_obj(arc_group, arc);
-	lv_indev_set_group(lvgl_input_get_indev(lvgl_encoder), arc_group);
+    lv_indev_t *encoder_indev = lvgl_input_get_indev(lvgl_encoder);
+    lv_indev_set_group(encoder_indev, arc_group);
+
+    // enable editing so encoder moves it
+    lv_group_set_editing(arc_group, true);
 #endif /* CONFIG_LV_Z_ENCODER_INPUT */
 
 #ifdef CONFIG_LV_Z_KEYPAD_INPUT
