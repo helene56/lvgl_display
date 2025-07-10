@@ -20,6 +20,7 @@
             low-power-enable;
         };
     };
+
 };
 
 &spi0 {
@@ -80,11 +81,35 @@
         };
     };
 
+    qdec2: qdec {
+        status = "okay";
+        compatible = "gpio-qdec";
+        gpios = <&gpio1 7 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>,
+                <&gpio1 8 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>;
+        zephyr,axis = <INPUT_REL_WHEEL>;
+        steps-per-period = <4>;
+        sample-time-us = <2000>;
+        idle-timeout-ms = <200>;
+    };
+
+    encoder {
+        status = "okay";
+        compatible = "zephyr,lvgl-encoder-input";
+        rotation-input-code = <INPUT_REL_WHEEL>;
+        // button-input-code = <INPUT_KEY_0>;
+        input = <&qdec2>;
+    };
+
+    
+
     chosen {
         zephyr,display = &st7789v_nrf52840;
     };
 
     aliases {
         backlight = &backlight0;
+
     };
+
+
 };
